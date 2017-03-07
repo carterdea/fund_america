@@ -1,16 +1,26 @@
 module FundAmerica
   class Error < StandardError
-    attr_reader :parsed_response
+    attr_reader :raw_response, :code
 
     # Contructor method to take response code and parsed_response
     # and give object methods in rescue - e.message and e.parsed_response
-    def initialize(parsed_response, code)
-      super(FundAmerica::Error.error_message(code, parsed_response))
-      @parsed_response = parsed_response
+    def initialize(raw_response, code)
+      @raw_response = raw_response
+      @code = code
+      super(error_message)
+    end
+
+    def parsed_response
+      return @parsed_response if @parsed_response
+      begin
+        @parsed_response = JSON.parse(raw_response)
+      rescue
+        @parsed_response = raw_response
+      end
     end
 
     # Method to return error message based on the response code
-    def self.error_message(code, parsed_response)
+    def error_message
       case code
       when 401 then
         'Authentication error. Your API key is incorrect'
@@ -23,7 +33,7 @@ module FundAmerica
       when 500 then
         "Internal server error. Something went wrong. This is a bug. Please report it to support immediately"
       else
-        'An error occured. Please check parsed_response for details'
+        'An error occured: #{parsed_response}'
       end
     end
 

@@ -8,7 +8,7 @@ describe FundAmerica::Error do
       @message_404 = 'Resource was not found'
       @message_422 = 'This usually means you are missing or have supplied invalid parameters for a request: {}'
       @message_500 = "Internal server error. Something went wrong. This is a bug. Please report it to support immediately"
-      @message_other = 'An error occured. Please check parsed_response for details'
+      @message_other = 'An error occured'
     end
 
     it 'must have an error message' do
@@ -26,7 +26,7 @@ describe FundAmerica::Error do
       end
 
       it 'must not match other error message when code is 401' do
-        expect(@response).not_to eq(@message_other)
+        expect(@response).not_to contains(@message_other)
       end
     end
 

@@ -9,15 +9,12 @@ module FundAmerica
         options = FundAmerica.basic_auth.merge!({:body => options})
         uri = FundAmerica.base_uri + uri unless uri.include?('test_mode')
         response = HTTParty.send(method, uri, options)
-        parsed_response = JSON.parse(response.body)
-        if response.code.to_i == 200
-          # Returns parsed_response - a hash of response body
-          # if response is successful
-          parsed_response
-        else
-          # Raises error if the response is not sucessful
-          raise FundAmerica::Error.new(parsed_response, response.code.to_i)
+
+        if response.code.to_i != 200
+          raise FundAmerica::Error.new(response, response.code.to_i)
         end
+
+        JSON.parse(response.body)
       end
 
       # End point: https://sandbox.fundamerica.com/api/test_mode/clear_data (POST)
